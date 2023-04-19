@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 app.get('/', (req, res)=> {
-    res.status(StatusCodes.OK).send(`<h1>Welcome to our port ${port} 🐱</h1>`)
+    res.status(200).send(`<h1>Welcome to our port ${port} 🐱</h1>`)
 })
 
 app.listen(port, () => {
