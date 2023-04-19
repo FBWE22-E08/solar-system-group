@@ -1,6 +1,4 @@
-//* get the Entire planet data for default endpoint "/" ==> http://localhost:5000/planets
-
-//* get a planet with the most moons for endpoint "/numOfMoons" ==> http://localhost:5000/planets/numOfMoons
+//* A. get the entire planet data with a default endpoint "/" ==> http://localhost:5000/planets
 
 import planets from "../planets-dataset.js";
 
@@ -13,9 +11,40 @@ export const getPlanets = async (req, res, next) => {
   }
 };
 
-//if endpoint is "most", please look for the planet with the most moons
-//if endpoint is "none", please look for the planet with no moons.
+//* B. get a planet with the most moons || one with no moons with an endpoint "/numOfMoons/:pick" ==> http://localhost:5000/planets/numOfMoons/:pick
 
+// if pick(req.params) is "/most", please get the planet with the most moons, and if pick(req.params) is "/none", please get the planet with no moons.
+
+//* Solution 1: Basic Approach
+export const numberOfMoons = async (req, res, next) => {
+    try {
+      const { pick } = req.params;
+      if (pick === "most") {
+        //* get the highest value from each planet's number of moons
+        const highestNum = Math.max(
+          ...planets.map((planet) => planet.numberOfMoons)
+        );
+        //* find THE PLANET with the highest value from the number of moons
+        const theFound = planets.find(planet => planet.numberOfMoons === highestNum)
+        res
+          .status(200)
+          .json(
+            `The planet with the most moons is ${theFound.name}, with ${theFound.numberOfMoons} moons.`
+          );
+      } else if (pick === "none") {
+          const noMoons = planets.filter(planet => planet.numberOfMoons === 0)
+        res
+        .status(200)
+        .json(noMoons.map(noMoon => noMoon.name))
+          
+      } else res.status(400).send("bad request");
+    } catch (error) {
+        next(error)
+    }
+  };
+
+  
+//* Solution 2: advanced approach
 //Bravo, Celine!
 export const numOfMoons = async (req, res, next) => {
   try {
@@ -35,31 +64,9 @@ export const numOfMoons = async (req, res, next) => {
       planetsArray.push(nonMoon.name);
 
       res.status(200).send(planetsArray);
-    } else res.status(404).send("bad request");
+    } else res.status(400).send("bad request");
   } catch (error) {
     next(error);
   }
 };
 
-//* Basic Approach
-export const numberOfMoons = async (req, res, next) => {
-  try {
-    const { pick } = req.params;
-    if (pick === "most") {
-      //* get the highest value from each planet's number of moons
-      const highestNum = Math.max(
-        ...planets.map((planet) => planet.numberOfMoons)
-      );
-      //* find THE PLANET with the highest value from the number of moons
-      const theFound = planets.find(planet => planet.numberOfMoons === highestNum)
-      res
-        .status(200)
-        .json(
-          `The planet with the most moons is ${theFound.name}, with ${theFound.numberOfMoons} moons.`
-        );
-    } else if (pick === "none") {
-        const nonMoons = planets.filter(planet => planet.numberOfMoons === 0)
-        
-    } else res.status(404).send("bad request");
-  } catch (error) {}
-};
